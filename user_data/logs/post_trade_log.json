@@ -1,0 +1,16 @@
+{
+  "recent_trades": [
+    {
+      "pair": "WIF-USDT",
+      "exit_reason": "TP",
+      "post_exit_1h_price_change": -0.02,
+      "verdict": "GOOD_EXIT"
+    },
+    {
+      "pair": "SUI-USDT",
+      "exit_reason": "TP",
+      "post_exit_1h_price_change": 0.05,
+      "verdict": "TOO_EARLY"
+    }
+  ]
+}

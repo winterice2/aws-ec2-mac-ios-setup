@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "version": "6.0",
+    "generated_at": "2025-12-10 19:51:36 UTC"
+  },
+  "market_state": {
+    "bias": "SIDEWAYS",
+    "volatility": "LOW",
+    "condition": "PERFECT_FOR_SCALP"
+  },
+  "recommendations": {
+    "best_hours": [
+      "00",
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07"
+    ],
+    "worst_hours": [
+      "08",
+      "09"
+    ],
+    "top_pairs": [
+      "WIF",
+      "SUI",
+      "NEAR",
+      "AAVE"
+    ]
+  },
+  "conclusions": [
+    "Market is in a stable sideways channel.",
+    "BTC Volatility is low (<1.5% hourly).",
+    "Perfect conditions for mean reversion strategies."
+  ]
+}
