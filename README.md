@@ -1,97 +1,322 @@
-# AWS EC2 Mac для iOS разработки: Пошаговая инструкция
+# 🎯 КНОПКА БАБЛО - Автономная Торговая Экосистема v2.0
 
-## Быстрый расчет AWS кредитов
-
-- **Стоимость EC2 Mac:** $1.083/час (mac1.metal)
-- **Минимальная аренда:** 24 часа подряд (лицензия Apple) → минимум $26
-- **AWS Free Tier кредиты:** $100 при регистрации + $100 за задания (6 мес)
-- **Лимит использования:** $200 / $1.083 ≈ 184 ч (или ~7.7 дней)
-- **Стратегия:** запускать только на время работы — хватит на 2 месяца по 4 ч/день
+> **Проект Павла (@dxbatr) - 13+ лет в крипте**  
+> AI архитектура и исполнение by Claude
 
 ---
 
-## Настройка: шаг за шагом
+## 🧠 ECOSYSTEM BRAIN - Автономный Мозг
 
-### 1. Аккаунт AWS и кредиты
-- Зарегистрироваться: [aws.amazon.com/free](https://aws.amazon.com/free)
-- Привязать карту — деньги не списываются, если не превысить $200
-- Получить $100 сразу, еще $100 — за выполнение задач (запуск EC2, алерты, tutorial)
-- **Настройте Budget/Alert** на $150: AWS Console → Billing → Budgets
+Система которая **ДУМАЕТ** как топовая LLM:
+- Собирает ВСЕ данные из всех источников
+- Анализирует контекст с помощью Gemini AI
+- Принимает решения автономно
+- Когда не может решить - записывает в feedback
 
-### 2. Dedicated Host для Mac
-- AWS Console → EC2 → Dedicated Hosts
-- "Allocate Dedicated Host" → mac1.metal/mac2.metal
-- Выберите зону (например, us-east-1a), кол-во: 1
-- Host Maintenance: Disabled
-- **После начала — сразу идут 24 ч аренды** (даже без instance)
+### 🏗️ Архитектура
 
-### 3. Запуск Mac Instance
-- EC2 Dashboard → Launch Instance
-- AMI: поищите "macOS Sonoma 14.x"
-- Instance Type: mac1.metal/mac2.metal
-- Key Pair: создать, скачать `.pem`
-- Security Group: SSH (22) + VNC (5900), Source My IP
-- Advanced: Tenancy — Dedicated Host, выбрать ваш Host ID
-- Launch → ждать 5–10 мин
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ECOSYSTEM BRAIN v2.0                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │ Data        │  │ Signal      │  │ Position    │          │
+│  │ Collectors  │→ │ Engine      │→ │ Manager     │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘          │
+│         ↓                ↓                ↓                  │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              GEMINI AI (2.5 Flash)                  │    │
+│  │  - Анализ каждые 15 мин                             │    │
+│  │  - Изменение config                                 │    │
+│  │  - Блокировка сигналов                              │    │
+│  └─────────────────────────────────────────────────────┘    │
+│         ↓                                                    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              BRAIN POLICY (железные правила)        │    │
+│  │  - Safety Bounds                                    │    │
+│  │  - Rate Limits                                      │    │
+│  │  - Emergency Safeguards                             │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### 4. SSH подключение
-- Получить Public IPv4
-- chmod 400 aws-mac-key.pem
-- ssh -i aws-mac-key.pem ec2-user@YOUR_IP
-- sudo /usr/bin/dscl . -passwd /Users/ec2-user
+### 📊 Уровни Развития
 
-### 5. Настройка VNC
-- sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist
-- ssh -i aws-mac-key.pem -L 5900:localhost:5900 ec2-user@YOUR_IP
-- [RealVNC Viewer](https://www.realvnc.com/en/connect/download/viewer/) → localhost:5900
-
-### 6. Xcode, инструменты, CI
-- App Store → Xcode (Apple ID)
-- Homebrew: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-- brew install git android-studio
-- sudo gem install cocoapods
-
-### 7. Клонирование проекта
-- ssh-keygen -t ed25519 -C "your_email@example.com"
-- cat ~/.ssh/id_ed25519.pub → добавить на GitHub
-- git clone git@github.com:your-username/trafficban.git
-
-### 8. Сборка Kotlin shared framework
-- cd ~/trafficban
-- ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64
-- Результат: shared.framework (iosSimulatorArm64)
-
-### 9. Открытие/сборка в Xcode
-- Xcode → Open → iosApp/iosApp.xcodeproj
-- Add shared.framework (Embed & Sign)
-- Add Run Script Phase: cd "$SRCROOT/.." && ./gradlew :shared:embedAndSignAppleFrameworkForXcode
-
-### 10. Запуск iOS Simulator
-- Выбрать девайс (iPhone 15 Pro)
-- Cmd+R: запуск
+| Уровень | Описание | Статус |
+|---------|----------|--------|
+| **1** | Brain меняет config_override.json, закрывает позиции | ✅ READY |
+| **2** | WebSocket, видит каждый тик, блокирует сигналы | ✅ READY |
+| **3** | ML модель, полная автономия | 🔄 TODO |
 
 ---
 
-## Советы по экономии
-- Останавливайте instance сразу после работы, хост — только после 24 ч.
-- Пример: 4 ч×день, 5 дней = $21.7/нед, $200 хватит на 2 мес+.
-- После 24 ч — освободите хост (release-hosts).
+## 🚀 Быстрый Старт
 
-## Альтернативы
-- MacStadium: $79/мес
-- GitHub Actions Mac: $0.08/мин. для private, бесплатно для публичных
-- Mac mini (~$600)
-- Codemagic: 500 мин/мес бесплатно
+### 1. Настройка окружения
+
+```bash
+# Клонируем репозиторий
+git clone <repo_url>
+cd workspace
+
+# Копируем и заполняем .env
+cp .env.example .env
+nano .env  # Вставьте API ключи
+```
+
+### 2. Запуск
+
+```bash
+# Только основной бот
+docker-compose up -d
+
+# + Мониторинг BTC/ETH и объёмов
+docker-compose --profile watcher up -d
+
+# + Brain (автономный мозг)
+docker-compose --profile brain up -d
+
+# ВСЁ
+docker-compose --profile full up -d
+```
+
+### 3. Проверка
+
+```bash
+# Логи бота
+docker logs bablobot_live -f
+
+# Логи Brain
+docker logs bablobot_brain -f
+
+# Статистика
+cat user_data/logs/stats.json | jq
+```
 
 ---
 
-### Чеклист
-- Аккаунт и кредиты AWS
-- Dedicated Host и instance
-- SSH и VNC готов
-- Xcode установлен
-- Kotlin/shared.framework собран
-- Xcode+Simulator работают
-- Биллинг-алерты настроены
+## 📁 Структура Проекта
 
-На $200 хватит на 2 месяца по 4 ч/день!
+```
+/workspace/
+├── config/
+│   ├── config.py              # Центральный конфиг
+│   └── config_override.json   # Brain пишет сюда
+│
+├── scripts/
+│   ├── bablobot/
+│   │   ├── ecosystem_brain.py # 🧠 Автономный мозг
+│   │   ├── brain_policy.py    # 🔒 Железные правила
+│   │   ├── data_collectors.py # 📊 Сбор данных
+│   │   ├── signals.py         # 📡 Генерация сигналов
+│   │   ├── position_manager.py# 💼 Управление позициями
+│   │   └── websocket_layer.py # 🌐 Real-time данные
+│   │
+│   └── analyze_waves.py       # 📈 Анализ рынка
+│
+├── user_data/
+│   ├── logs/
+│   │   ├── ecosystem_feedback/
+│   │   │   ├── errors/        # ❌ Ошибки
+│   │   │   ├── unsolved/      # ❓ Нерешённые проблемы
+│   │   │   ├── needs/         # 📝 Что нужно добавить
+│   │   │   └── decisions/     # ⚡ Решения Brain
+│   │   │
+│   │   ├── daily_analysis/    # Ежедневные отчёты
+│   │   ├── trades.json        # История сделок
+│   │   ├── stats.json         # Статистика
+│   │   └── brain.log          # Лог Brain
+│   │
+│   └── data/
+│       ├── btc_watcher/       # BTC/ETH данные
+│       ├── volume/            # Объёмы торгов
+│       ├── spot_flow/         # BUY/SELL pressure
+│       └── lag_data/          # WebSocket raw data
+│
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 🎯 Ключевые Модули
+
+### 🧠 Ecosystem Brain (`ecosystem_brain.py`)
+
+Автономный мозг системы:
+- Собирает ВСЕ данные каждые 15 минут
+- Анализирует через Gemini AI
+- Принимает решения и выполняет
+- Записывает проблемы в feedback
+
+```python
+# Запуск
+python -m scripts.bablobot.ecosystem_brain
+```
+
+### 🔒 Brain Policy (`brain_policy.py`)
+
+Железные правила которые Brain НЕ МОЖЕТ нарушить:
+- **SAFETY_BOUNDS**: пределы значений параметров
+- **Rate Limits**: max 2 изменения в час
+- **Emergency Safeguards**: автопауза при DD
+
+### 📊 Data Collectors (`data_collectors.py`)
+
+| Коллектор | Интервал | Что собирает |
+|-----------|----------|--------------|
+| BTCWatcher | 60s | BTC/ETH цены, изменения, алерты |
+| VolumeCollector | 5min | Объёмы по всем парам |
+| SpotFlowCollector | 2min | BUY/SELL pressure |
+| PositionsCollector | 30s | Текущие позиции |
+| StatsCollector | 60s | Торговая статистика |
+
+### 📡 Signal Engine (`signals.py`)
+
+Модули сигналов:
+- **Momentum Detector**: импульсы >0.18%/15s
+- **BTC Trend Guard**: блокировка по тренду BTC
+- **Spot Flow Signals**: по давлению покупок/продаж
+- **Time Phase Filter**: фильтр по времени суток
+
+### 💼 Position Manager (`position_manager.py`)
+
+- Открытие позиций через BingX API
+- Мониторинг TP (трёхфазный)
+- Emergency Exit
+- Логирование сделок
+
+### 🌐 WebSocket Layer (`websocket_layer.py`)
+
+Real-time данные:
+- Тики каждые 100ms
+- Сделки в реальном времени
+- Детекция спайков цены/объёма
+
+---
+
+## ⚙️ Конфигурация
+
+### Трёхфазный TP (по UTC)
+
+| Фаза | Время | TP | Режим |
+|------|-------|-----|-------|
+| 🌙 Ночь | 00-08 | 2.45% | AGGRESSIVE, LONG+SHORT |
+| ☀️ День | 08-16 | 2.20% | LONG_ONLY (без SHORT!) |
+| 🌆 Вечер | 16-24 | 2.80% | CONSERVATIVE |
+
+### BTC Trend Guard
+
+- BTC +1.5%/час → блокируем SHORT
+- BTC -1.5%/час → блокируем LONG
+- Кешируется на 60 сек
+
+### Safety Bounds
+
+```python
+SAFETY_BOUNDS = {
+    "momentum_threshold_fast": {"min": 0.001, "max": 0.003},
+    "momentum_threshold_slow": {"min": 0.0008, "max": 0.002},
+    "min_profit_pct": {"min": 0.015, "max": 0.06, "protected": True},
+    "max_leverage": {"min": 2, "max": 15, "only_down": True},
+    "max_positions": {"min": 5, "max": 24}
+}
+```
+
+---
+
+## 📈 Мониторинг и Анализ
+
+### Анализ рынка
+
+```bash
+# Ручной запуск
+python scripts/analyze_waves.py
+
+# Внутри Docker
+docker exec bablobot_live python3 /app/scripts/analyze_waves.py
+
+# Последний отчёт
+cat user_data/logs/daily_analysis/latest.json | jq
+```
+
+### Логи
+
+```bash
+# Brain решения
+tail -f user_data/logs/brain.log
+
+# Brain audit (JSONL)
+tail user_data/logs/brain_audit.jsonl
+
+# Ошибки экосистемы
+ls user_data/logs/ecosystem_feedback/errors/
+
+# Нерешённые проблемы
+ls user_data/logs/ecosystem_feedback/unsolved/
+```
+
+---
+
+## 🔐 Gemini API
+
+| Модель | Назначение | Стоимость |
+|--------|------------|-----------|
+| gemini-2.5-flash | Brain 24/7 | $0.30/1M in + $2.50/1M out |
+| gemini-2.5-pro | R&D анализ | $1.25/1M in + $10/1M out |
+| gemini-3-pro-preview | Глубокий анализ | $2/1M in + $12/1M out |
+
+API Key: Задан по умолчанию, €1034 кредитов Google Cloud
+
+---
+
+## 🛡️ Принципы Работы
+
+### Главный принцип
+> **Не закрывать позиции в минусе если нет угрозы ликвидации!**
+
+Крипта волатильная - позиция может быть -90% и откатиться.
+
+### Feedback Loop
+
+1. Экосистема работает автономно
+2. Когда не может решить проблему - записывает в feedback
+3. Мы видим feedback и добавляем новый код
+4. Экосистема становится умнее
+5. Повторяем
+
+---
+
+## 📊 Торговые Пары
+
+### Whitelist (приоритет)
+WIF, SUI, NEAR, FET, ARB, SOL, DOGE, BNB
+
+### Blacklist (медленные "якоря")
+LTC, UNI, SEI, XRP, POL, ATOM, CRV
+
+---
+
+## 🚨 Emergency
+
+### Автопауза
+- Daily DD > -5% → автопауза
+- Weekly DD > -15% → автопауза
+- 3 ухудшения подряд → блок Brain
+
+### Emergency Exit
+- Позиция > 180 мин И PnL < 0.5% → FORCE CLOSE
+
+---
+
+## 📞 Контакты
+
+**Владелец:** Павел (@dxbatr)  
+**AI Architect:** Claude
+
+---
+
+## 📜 Лицензия
+
+Проприетарный код. Все права защищены.

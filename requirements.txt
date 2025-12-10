@@ -1,0 +1,39 @@
+# =============================================================================
+# 📦 BABLOBOT ECOSYSTEM - DEPENDENCIES
+# =============================================================================
+# Все зависимости для торговой экосистемы
+# =============================================================================
+
+# Core
+aiohttp>=3.9.0
+asyncio>=3.4.3
+
+# WebSocket
+websockets>=12.0
+
+# Google Gemini AI
+google-generativeai>=0.3.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Utilities
+python-dateutil>=2.8.2
+pytz>=2023.3
+
+# HTTP client
+httpx>=0.25.0
+requests>=2.31.0
+
+# JSON handling
+ujson>=5.8.0
+
+# Logging
+structlog>=23.2.0
+
+# Type hints
+typing-extensions>=4.8.0
+
+# Environment
+python-dotenv>=1.0.0

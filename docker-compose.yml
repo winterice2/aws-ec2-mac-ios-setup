@@ -1,0 +1,234 @@
+version: '3.8'
+
+# =============================================================================
+# 🐳 BABLOBOT ECOSYSTEM - DOCKER COMPOSE
+# =============================================================================
+# Запускает все сервисы экосистемы
+#
+# ПРОФИЛИ:
+#   - default: основные сервисы
+#   - watcher: мониторинг BTC/ETH и объёмов
+#   - brain: автономный мозг
+#   - full: все сервисы
+#
+# КОМАНДЫ:
+#   docker-compose up -d                    # Основные сервисы
+#   docker-compose --profile watcher up -d  # + Мониторинг
+#   docker-compose --profile brain up -d    # + Brain
+#   docker-compose --profile full up -d     # Всё
+#
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # 🤖 BABLOBOT LIVE - Основной торговый бот
+  # ===========================================================================
+  bablobot_live:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bablobot_live
+    restart: unless-stopped
+    environment:
+      - BINGX_API_KEY=${BINGX_API_KEY}
+      - BINGX_SECRET_KEY=${BINGX_SECRET_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-AIzaSyCyEuXhUu7DqM1MMzZrAgHrxFNvUbZy2AY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - TZ=UTC
+    volumes:
+      - ./user_data:/app/user_data
+      - ./config:/app/config
+      - ./scripts:/app/scripts
+    command: python -m scripts.bablobot.position_manager
+    networks:
+      - bablobot_network
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # 🧠 ECOSYSTEM BRAIN - Автономный мозг
+  # ===========================================================================
+  bablobot_brain:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bablobot_brain
+    restart: unless-stopped
+    profiles:
+      - brain
+      - full
+    environment:
+      - BINGX_API_KEY=${BINGX_API_KEY}
+      - BINGX_SECRET_KEY=${BINGX_SECRET_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-AIzaSyCyEuXhUu7DqM1MMzZrAgHrxFNvUbZy2AY}
+      - TZ=UTC
+    volumes:
+      - ./user_data:/app/user_data
+      - ./config:/app/config
+      - ./scripts:/app/scripts
+    command: python -m scripts.bablobot.ecosystem_brain
+    networks:
+      - bablobot_network
+    depends_on:
+      - bablobot_live
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # 📈 BTC WATCHER - Мониторинг BTC/ETH
+  # ===========================================================================
+  btc_watcher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: btc_watcher
+    restart: unless-stopped
+    profiles:
+      - watcher
+      - full
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./user_data:/app/user_data
+      - ./scripts:/app/scripts
+    command: python -c "
+      import asyncio
+      from scripts.bablobot.data_collectors import BTCWatcher
+      asyncio.run(BTCWatcher().run())
+      "
+    networks:
+      - bablobot_network
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # ===========================================================================
+  # 📊 VOLUME MONITOR - Мониторинг объёмов
+  # ===========================================================================
+  volume_monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: volume_monitor
+    restart: unless-stopped
+    profiles:
+      - watcher
+      - full
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./user_data:/app/user_data
+      - ./scripts:/app/scripts
+    command: python -c "
+      import asyncio
+      from scripts.bablobot.data_collectors import VolumeCollector
+      asyncio.run(VolumeCollector().run())
+      "
+    networks:
+      - bablobot_network
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # ===========================================================================
+  # 💰 SPOT FLOW COLLECTOR - BUY/SELL Pressure
+  # ===========================================================================
+  spot_flow_collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spot_flow_collector
+    restart: unless-stopped
+    profiles:
+      - watcher
+      - full
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./user_data:/app/user_data
+      - ./scripts:/app/scripts
+    command: python -c "
+      import asyncio
+      from scripts.bablobot.data_collectors import SpotFlowCollector
+      asyncio.run(SpotFlowCollector().run())
+      "
+    networks:
+      - bablobot_network
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # ===========================================================================
+  # 🌐 WEBSOCKET LAYER - Real-time данные
+  # ===========================================================================
+  websocket_layer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: websocket_layer
+    restart: unless-stopped
+    profiles:
+      - realtime
+      - full
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./user_data:/app/user_data
+      - ./scripts:/app/scripts
+    command: python -m scripts.bablobot.websocket_layer
+    networks:
+      - bablobot_network
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # 📍 POSITIONS COLLECTOR - Сбор позиций
+  # ===========================================================================
+  positions_collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: positions_collector
+    restart: unless-stopped
+    profiles:
+      - collector
+      - full
+    environment:
+      - BINGX_API_KEY=${BINGX_API_KEY}
+      - BINGX_SECRET_KEY=${BINGX_SECRET_KEY}
+      - TZ=UTC
+    volumes:
+      - ./user_data:/app/user_data
+      - ./scripts:/app/scripts
+    command: python -c "
+      import asyncio
+      from scripts.bablobot.data_collectors import PositionsCollector
+      asyncio.run(PositionsCollector().run())
+      "
+    networks:
+      - bablobot_network
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+networks:
+  bablobot_network:
+    driver: bridge

@@ -1,0 +1,67 @@
+# =============================================================================
+# 🚫 GITIGNORE - BABLOBOT ECOSYSTEM
+# =============================================================================
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs (keep structure, ignore content)
+user_data/logs/*.log
+user_data/logs/*.jsonl
+user_data/logs/ecosystem_feedback/errors/*.json
+user_data/logs/ecosystem_feedback/unsolved/*.json
+user_data/logs/ecosystem_feedback/needs/*.json
+user_data/logs/ecosystem_feedback/decisions/*.json
+user_data/logs/daily_analysis/*.json
+
+# Data (keep structure, ignore content)
+user_data/data/btc_watcher/*.jsonl
+user_data/data/volume/*.jsonl
+user_data/data/spot_flow/*.jsonl
+user_data/data/lag_data/*.jsonl
+
+# BUT KEEP archive for history
+!user_data/logs/archive/
+
+# Trade data (sensitive)
+user_data/logs/trades.json
+user_data/logs/positions.json
+user_data/logs/stats.json
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+*.tmp
+*.temp
+*.bak
+
+# Test
+.pytest_cache/
+.coverage
+htmlcov/
